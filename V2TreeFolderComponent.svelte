@@ -145,8 +145,11 @@
         if (shouldResponsibleFor(evt)) {
             evt.preventDefault();
             
+            // Only handle the idx tag when clicking on the folder title, not the arrow
+            const isArrowClick = evt.target instanceof Element && evt.target.matchParent(".collapse-icon");
+            
             // Check if this tag has an idx subfolder with a single file
-            if (viewType === "tags" && !isRoot) {
+            if (viewType === "tags" && !isRoot && !isArrowClick) {
                 const idxTag = `${trimTrailingSlash(thisName)}/idx`;
                 const idxItems = _items.filter(item => 
                     item.tags.some(tag => 
@@ -155,9 +158,10 @@
                     )
                 );
                 
-                // If there's exactly one file in the idx folder, open it
+                // If there's exactly one file in the idx folder, open it instead of toggling
                 if (idxItems.length === 1) {
                     openFile(idxItems[0].path, false);
+                    return;
                 }
             }
             
