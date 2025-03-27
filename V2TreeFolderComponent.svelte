@@ -746,6 +746,20 @@
     //@ts-ignore internal API
     const dm = $derived(app?.dragManager);
 
+    // Add this new derived state property to check if the folder has an idx note
+    const hasIdxNote = $derived(() => {
+        if (viewType !== "tags" || isRoot) return false;
+        
+        const idxTag = `${trimTrailingSlash(thisName)}/idx`;
+        const idxItems = _items.filter(item => 
+            item.tags.some(tag => 
+                tag.toLowerCase() === idxTag.toLowerCase() || 
+                (tag + "/").toLowerCase().startsWith(idxTag.toLowerCase() + "/")
+            )
+        );
+        
+        return idxItems.length === 1;
+    });
 
     $effect(() => {
         const key = trailKey + (isRoot ? "-r" : "-x") + viewContextID;
@@ -803,7 +817,7 @@
         <OnDemandRender
             cssClass={`tree-item-self${
                 !isRoot ? " is-clickable mod-collapsible" : ""
-            } nav-folder-title tag-folder-title${isActive ? " is-active" : ""}`}
+            } nav-folder-title tag-folder-title${isActive ? " is-active" : ""}${hasIdxNote() ? " has-idx-note" : ""}`}
             bind:isVisible={isFolderVisible}
         >
             <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -824,7 +838,7 @@
             >
                 {#if isFolderVisible}
                     <div
-                        class="tagfolder-titletagname"
+                        class="tagfolder-titletagname${hasIdxNote() ? ' has-idx-note' : ''}"
                         {draggable}
                         ondragstart={dragStartName}
                     >
@@ -897,3 +911,11 @@
         {/if}
     {/if}
 </div>
+
+<style>
+/* Add this to the bottom of the file */
+.has-idx-note {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+</style>
