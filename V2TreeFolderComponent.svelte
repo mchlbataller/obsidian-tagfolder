@@ -404,9 +404,18 @@
             if (!isRoot || _setting.expandUntaggedToRoot) {
                 tagsAll = tagsAll.filter((e) => e != "_untagged");
             }
+            
+            // Filter out idx tags when the setting is enabled, but keep them accessible for hasIdxNote check
+            if (_setting.hideIdxFolders) {
+                tagsAll = tagsAll.filter((tag) => {
+                    const parts = tag.split('/');
+                    return parts[parts.length - 1].toLowerCase() !== 'idx';
+                });
+            }
         }
         return tagsAll;
     });
+
     const tagsExceptAlreadyShown = $derived(
         viewType!="tags"?[]:displayTagCandidates.filter((tag) =>
             trail.every(
@@ -745,7 +754,7 @@
     //@ts-ignore internal API
     const dm = $derived(app?.dragManager);
 
-    // Add this new derived state property to check if the folder has an idx note
+    // Modify the hasIdxNote function to check for idx notes regardless of hideIdxFolders setting
     const hasIdxNote = $derived(() => {
         if (viewType !== "tags" || isRoot) return false;
         
