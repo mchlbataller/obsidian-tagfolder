@@ -144,6 +144,23 @@
         evt.stopPropagation();
         if (shouldResponsibleFor(evt)) {
             evt.preventDefault();
+            
+            // Check if this tag has an idx subfolder with a single file
+            if (viewType === "tags" && !isRoot) {
+                const idxTag = `${trimTrailingSlash(thisName)}/idx`;
+                const idxItems = _items.filter(item => 
+                    item.tags.some(tag => 
+                        tag.toLowerCase() === idxTag.toLowerCase() || 
+                        (tag + "/").toLowerCase().startsWith(idxTag.toLowerCase() + "/")
+                    )
+                );
+                
+                // If there's exactly one file in the idx folder, open it
+                if (idxItems.length === 1) {
+                    openFile(idxItems[0].path, false);
+                }
+            }
+            
             // Do not toggle this tree directly.
             if (_setting.useMultiPaneList) {
                 selectedTags.set(trail);
