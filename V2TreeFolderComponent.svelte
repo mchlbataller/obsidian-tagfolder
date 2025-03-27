@@ -158,10 +158,9 @@
                     )
                 );
                 
-                // If there's exactly one file in the idx folder, open it instead of toggling
+                // If there's exactly one file in the idx folder, open it
                 if (idxItems.length === 1) {
                     openFile(idxItems[0].path, false);
-                    return;
                 }
             }
             
