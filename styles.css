@@ -137,3 +137,19 @@
 	background-position: 0 0;
 	background-size: 10px 10px;
 }
+
+/* Add styling for the delete menu item */
+.tag-folder-delete-item {
+    color: var(--text-error) !important;
+}
+
+.tag-folder-delete-item .menu-item-icon {
+    color: var(--text-error) !important;
+}
+
+.modal-button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}

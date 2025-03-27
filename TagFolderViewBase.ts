@@ -1,4 +1,4 @@
-import { ItemView, Menu, Notice } from "obsidian";
+import { ItemView, Menu, Notice, Modal, TFile } from "obsidian";
 import { mount } from 'svelte'
 import TagFolderPlugin from "./main";
 import {
@@ -295,7 +295,22 @@ export abstract class TagFolderViewBase extends ItemView {
 					.onClick(async () => {
 						await this.app.workspace.openLinkText(path, path, "split");
 					})
-			);
+				);
+				
+				// Add Delete Note option
+				menu.addItem((item) => {
+					item
+						.setTitle("Delete note")
+						.setSection("danger")
+						.setIcon("trash")
+						.onClick(() => {
+							if (file instanceof TFile) {
+								this.confirmDelete(file);
+							}
+						});
+					item.dom.classList.add("tag-folder-delete-item");
+					return item;
+				});
 		} else if (!isTagTree && targetTag) {
 			const path = targetTag;
 			const file = this.app.vault.getAbstractFileByPath(path);
@@ -338,6 +353,40 @@ export abstract class TagFolderViewBase extends ItemView {
 		}
 		evt.preventDefault();
 		// menu.showAtMouseEvent(evt);
+	}
+
+	// Add the confirmDelete method
+	async confirmDelete(file: TFile) {
+		const modal = new Modal(this.app);
+		modal.titleEl.setText("Confirm Deletion");
+		
+		modal.contentEl.createEl("p", {
+			text: `Are you sure you want to delete "${file.name}"?`
+		});
+		
+		const buttonContainer = modal.contentEl.createDiv("modal-button-container");
+		
+		buttonContainer.createEl("button", {
+			text: "Cancel",
+			cls: "mod-danger"
+		}).addEventListener("click", () => {
+			modal.close();
+		});
+		
+		buttonContainer.createEl("button", {
+			text: "Delete",
+			cls: "mod-warning"
+		}).addEventListener("click", async () => {
+			try {
+				await this.app.vault.trash(file, true);
+				new Notice(`Deleted ${file.name}`);
+			} catch (error) {
+				new Notice(`Failed to delete ${file.name}: ${error.message}`);
+			}
+			modal.close();
+		});
+		
+		modal.open();
 	}
 
 	switchView() {

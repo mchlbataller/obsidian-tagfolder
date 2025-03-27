@@ -77,6 +77,12 @@
             return dm.onDragStart(args, param);
         }
     }
+
+    export function openMenu(evt: MouseEvent) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        showMenu(evt, trail, item.path, [item]);
+    }
 </script>
 
 <OnDemandRender

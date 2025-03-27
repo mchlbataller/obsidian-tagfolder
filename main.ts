@@ -1316,6 +1316,37 @@ export default class TagFolderPlugin extends Plugin {
 			await this.app.vault.append(ww, expandedTags);
 		}
 	}
+
+	async confirmDelete(filename: string): Promise<boolean> {
+		return new Promise((resolve) => {
+			const modal = new Modal(this.app);
+			modal.titleEl.setText("Confirm Deletion");
+			
+			modal.contentEl.createEl("p", {
+				text: `Are you sure you want to delete "${filename}"?`
+			});
+			
+			const buttonContainer = modal.contentEl.createDiv("modal-button-container");
+			
+			buttonContainer.createEl("button", {
+				text: "Cancel",
+				cls: "mod-warning"
+			}).addEventListener("click", () => {
+				modal.close();
+				resolve(false);
+			});
+			
+			buttonContainer.createEl("button", {
+				text: "Delete",
+				cls: "mod-danger"
+			}).addEventListener("click", () => {
+				modal.close();
+				resolve(true);
+			});
+			
+			modal.open();
+		});
+	}
 }
 
 class TagFolderSettingTab extends PluginSettingTab {
@@ -1846,13 +1877,7 @@ class TagFolderSettingTab extends PluginSettingTab {
 								.map((e) =>
 									e
 										.split("/")
-										.map((e) =>
-											e.startsWith("_VIRTUAL")
-												? e
-												: x.has(e)
-												? x.get(e)
-												: (x.set(e, `tag${i++}`), i)
-										)
+										.filter((ee) => !isSpecialTag(ee))
 										.join("/")
 								)
 								.filter((e) => e.length)
