@@ -277,3 +277,16 @@ If the note has the tag that is set in here, the note would be treated as there 
 Tags that were set here would be treated as there were not.
 
 ##### Archive tags
+
+### Tag Folder Notes
+
+We've added a convenient way to access index notes for tag folders directly from the folder view:
+
+Quick Access to Index Notes: When a tag folder contains an "idx" subfolder with a single file, clicking the folder title will open that file instead of expanding the folder.
+
+Visual Indication: Tag folders with available index notes are underlined, making it easy to identify which folders have associated index content.
+
+Expanded Folder Access: You can still expand and collapse folders with index notes by clicking on the arrow icon, maintaining all original navigation functionality.
+
+This feature allows you to create dedicated index/overview notes for your tag hierarchies that are quickly accessible with a single click, while preserving the ability to browse all files in that tag folder when needed.
+
