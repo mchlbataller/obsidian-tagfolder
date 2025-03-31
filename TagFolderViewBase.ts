@@ -153,6 +153,13 @@ export abstract class TagFolderViewBase extends ItemView {
 		menu.showAtMouseEvent(evt);
 	}
 
+	// Add this new method to handle refresh action
+	refreshTree(evt: MouseEvent) {
+		evt.preventDefault();
+		this.plugin.refreshAllTree();
+		new Notice("Tag tree refreshed");
+	}
+
 	abstract getViewType(): string;
 
 	showMenu(

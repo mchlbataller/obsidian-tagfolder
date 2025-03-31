@@ -56,6 +56,7 @@ export class TagFolderList extends TagFolderViewBase {
 		this.newNote = this.newNote.bind(this);
 		this.showLevelSelect = this.showLevelSelect.bind(this);
 		this.switchView = this.switchView.bind(this);
+		this.refreshTree = this.refreshTree.bind(this); // Bind the new refresh method
 	}
 
 	async newNote(evt: MouseEvent) {
@@ -81,6 +82,7 @@ export class TagFolderList extends TagFolderViewBase {
 				showMenu: this.showMenu,
 				showLevelSelect: this.showLevelSelect,
 				showOrder: this.showOrder,
+				refreshTree: this.refreshTree, // Add this new property
 				newNote: this.newNote,
 				openScrollView: this.plugin.openScrollView,
 				isViewSwitchable: this.plugin.settings.useMultiPaneList,

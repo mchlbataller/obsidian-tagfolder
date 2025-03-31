@@ -24,6 +24,7 @@ export class TagFolderView extends TagFolderViewBase {
 		this.newNote = this.newNote.bind(this);
 		this.showLevelSelect = this.showLevelSelect.bind(this);
 		this.switchView = this.switchView.bind(this);
+		this.refreshTree = this.refreshTree.bind(this); // Bind the new refresh method
 		this.treeViewType = viewType;
 		// this.setState({ viewType: this.viewType, type: this.getViewType() }, {});
 	}
@@ -53,6 +54,7 @@ export class TagFolderView extends TagFolderViewBase {
 					showMenu: this.showMenu,
 					showLevelSelect: this.showLevelSelect,
 					showOrder: this.showOrder,
+					refreshTree: this.refreshTree, // Add this new property
 					newNote: this.newNote,
 					openScrollView: this.plugin.openScrollView,
 					isViewSwitchable: this.plugin.settings.useMultiPaneList,

@@ -46,6 +46,7 @@
 		switchView: () => void;
 		viewType?: TREE_TYPE;
 		stateStore?: Writable<TagFolderListState>;
+		refreshTree: () => void;
 	}
 
 	let {
@@ -64,6 +65,7 @@
 		switchView,
 		viewType = "tags",
 		stateStore,
+		refreshTree,
 	}: Props = $props();
 
 	const isMainTree = $derived(tags.length == 0);
@@ -133,6 +135,7 @@
 	let incomingIcon = $state("");
 	let bothIcon = $state("");
 	let linkIcon = $state("");
+	let refreshIcon = $state("");
 
 	async function switchIncoming() {
 		let newSet = { ..._setting };
@@ -243,6 +246,8 @@
 			}
 			setIcon(iconDivEl, "lucide-arrow-left-right");
 			switchIcon = iconDivEl.innerHTML;
+			setIcon(iconDivEl, "refresh-cw");
+			refreshIcon = iconDivEl.innerHTML;
 		}
 		const int = setInterval(() => {
 			performHide.set(Date.now());
@@ -393,6 +398,10 @@
 				{@html linkIcon}
 			</div>
 		{/if}
+		<!-- Add refresh icon button -->
+		<div class="clickable-icon nav-action-button" aria-label="Refresh" onclick={refreshTree}>
+			{@html refreshIcon}
+		</div>
 	</div>
 </div>
 {#if showSearch && isMainTree}
