@@ -275,6 +275,60 @@ export abstract class TagFolderViewBase extends ItemView {
 								await this.plugin.saveTagInfo();
 							});
 					});
+
+					// Add rename tag option
+					menu.addItem((item) => {
+						item.setTitle(`Rename tag`)
+							.setIcon("text-cursor-input")
+							.onClick(async () => {
+								// Only rename exact tag match, not nested tags
+								if (tag.includes("/")) {
+									new Notice("Cannot rename nested tags. Please rename the leaf tag only.");
+									return;
+								}
+								
+								const newTagName = await askString(
+									this.app,
+									"Rename tag",
+									"Enter new tag name:",
+									tag
+								);
+								
+								if (newTagName === false || newTagName === tag) return;
+								
+								// Check if new name is valid
+								if (!newTagName || newTagName.includes(" ") || newTagName.includes("#")) {
+									new Notice("Invalid tag name. Tag names cannot contain spaces or # symbols.");
+									return;
+								}
+								
+								// Confirm before proceeding with renaming
+								const shouldRename = await this.plugin.confirmAction(
+									`Are you sure you want to rename tag "${tag}" to "${newTagName}"?\n\nThis will modify all files containing this exact tag.`
+								);
+								
+								if (shouldRename) {
+									// Perform the tag renaming
+									const result = await this.plugin.renameTag(tag, newTagName);
+									if (result.success) {
+										new Notice(`Renamed tag "${tag}" to "${newTagName}" in ${result.filesModified} files.`);
+										
+										// Update tag info if any
+										if (tag in this.plugin.tagInfo) {
+											this.plugin.tagInfo[newTagName] = {...this.plugin.tagInfo[tag]};
+											delete this.plugin.tagInfo[tag];
+											await this.plugin.saveTagInfo();
+										}
+										
+										// Refresh the view
+										this.plugin.refreshAllTree();
+									} else {
+										new Notice(`Failed to rename tag: ${result.error}`);
+									}
+								}
+							});
+					});
+
 					menu.addItem((item) => {
 						item.setTitle(`Change the mark`)
 							.setIcon("pencil")

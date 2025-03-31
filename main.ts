@@ -6,6 +6,7 @@ import {
 	Editor,
 	getAllTags,
 	MarkdownView,
+	Modal,
 	normalizePath,
 	Notice,
 	parseYaml,
@@ -1346,6 +1347,123 @@ export default class TagFolderPlugin extends Plugin {
 			
 			modal.open();
 		});
+	}
+
+	async confirmAction(message: string): Promise<boolean> {
+		return new Promise((resolve) => {
+			const modal = new Modal(this.app);
+			modal.titleEl.setText("Confirm Action");
+			
+			modal.contentEl.createEl("p", {
+				text: message
+			});
+			
+			const buttonContainer = modal.contentEl.createDiv("modal-button-container");
+			
+			buttonContainer.createEl("button", {
+				text: "Cancel",
+				cls: "mod-warning"
+			}).addEventListener("click", () => {
+				modal.close();
+				resolve(false);
+			});
+			
+			buttonContainer.createEl("button", {
+				text: "Confirm",
+				cls: "mod-primary"
+			}).addEventListener("click", () => {
+				modal.close();
+				resolve(true);
+			});
+			
+			modal.open();
+		});
+	}
+
+	async renameTag(oldTagName: string, newTagName: string): Promise<{success: boolean, filesModified: number, error?: string}> {
+		try {
+			let filesModified = 0;
+			
+			// Get all files with this tag
+			const filesWithTag = this.fileCaches.filter(fileCache => 
+				fileCache.tags.some(tag => 
+					// Match exact tag ("#tag" not "#tag/subtag" or "#tagextra")
+					tag === `#${oldTagName}` || 
+					// Also match nested tags if they start with this exact tag
+					tag.startsWith(`#${oldTagName}/`)
+				)
+			);
+			
+			for (const fileCache of filesWithTag) {
+				const file = fileCache.file;
+				
+				// Skip non-markdown files
+				if (file.extension !== 'md') continue;
+				
+				try {
+					// Read file content
+					const content = await this.app.vault.read(file);
+					
+					// Create the regex to match the exact tag or nested tags starting with oldTagName
+					// Using word boundary to ensure we match complete tags
+					const tagRegex = new RegExp(`#${oldTagName}(\\b|\\/)`, 'g');
+					
+					// Check if the file contains the tag
+					if (content.match(tagRegex)) {
+						// Replace tags in content
+						const newContent = content.replace(tagRegex, `#${newTagName}$1`);
+						
+						// Write the modified content back
+						await this.app.vault.modify(file, newContent);
+						filesModified++;
+					}
+					
+					// Also check and update frontmatter if needed
+					const metadata = this.app.metadataCache.getFileCache(file);
+					if (metadata?.frontmatter && metadata.frontmatter.tags) {
+						let tags = metadata.frontmatter.tags;
+						let needsUpdate = false;
+						
+						if (Array.isArray(tags)) {
+							// If tags is an array, check each tag
+							const newTags = tags.map((tag: string) => {
+								if (tag === oldTagName || tag.startsWith(`${oldTagName}/`)) {
+									needsUpdate = true;
+									return tag.replace(new RegExp(`^${oldTagName}(\\b|\\/)`, 'g'), `${newTagName}$1`);
+								}
+								return tag;
+							});
+							
+							if (needsUpdate) {
+								await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+									frontmatter.tags = newTags;
+								});
+								
+								// Count this only if we hadn't already modified the file
+								if (!content.match(tagRegex)) {
+									filesModified++;
+								}
+							}
+						}
+					}
+				} catch (error) {
+					console.error(`Error processing file ${file.path}:`, error);
+					continue;
+				}
+			}
+			
+			return { 
+				success: true, 
+				filesModified 
+			};
+		} catch (error) {
+			console.error("Error renaming tag:", error);
+			return { 
+				success: false, 
+				filesModified: 0, 
+				error: error instanceof Error ? error.message : String(error)
+			};
+		}
 	}
 }
 
