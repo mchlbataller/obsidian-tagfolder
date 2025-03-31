@@ -140,16 +140,59 @@
 
 /* Add styling for the delete menu item */
 .tag-folder-delete-item {
-    color: var(--text-error) !important;
+	color: var(--text-error) !important;
 }
 
 .tag-folder-delete-item .menu-item-icon {
-    color: var(--text-error) !important;
+	color: var(--text-error) !important;
 }
 
 .modal-button-container {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.folder-results-container {
+	max-height: 200px;
+	overflow-y: auto;
+	margin-bottom: 12px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+}
+
+.folder-input-container {
+	margin-bottom: 12px;
+}
+
+.folder-input-container label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.folder-input-container input {
+	width: 100%;
+	padding: 5px;
+}
+
+.suggestion-item {
+	padding: 6px;
+	cursor: pointer;
+}
+
+.suggestion-item:hover,
+.suggestion-item.is-selected {
+	background-color: var(--background-modifier-hover) !important;
+}
+
+.suggestion-empty {
+	padding: 6px;
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+.move-files-description {
+	margin-bottom: 15px;
+	color: var(--text-muted);
 }
