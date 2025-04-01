@@ -147,6 +147,8 @@
             
             // Only handle the idx tag when clicking on the folder title, not the arrow
             const isArrowClick = evt.target instanceof Element && evt.target.matchParent(".collapse-icon");
+
+            console.log("toggleFolder", thisName, isArrowClick);
             
             // Check if this tag has an idx subfolder with a single file
             if (viewType === "tags" && !isRoot && !isArrowClick) {
@@ -842,7 +844,7 @@
             </div>
             <div
                 class="tree-item-inner nav-folder-title-content lsl-f"
-                onclick={handleOpenItem}
+                onclick={toggleFolder}
             >
                 {#if isFolderVisible}
                     <div
