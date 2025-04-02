@@ -406,14 +406,6 @@
             if (!isRoot || _setting.expandUntaggedToRoot) {
                 tagsAll = tagsAll.filter((e) => e != "_untagged");
             }
-            
-            // Filter out idx tags when the setting is enabled, but keep them accessible for hasIdxNote check
-            if (_setting.hideIdxFolders) {
-                tagsAll = tagsAll.filter((tag) => {
-                    const parts = tag.split('/');
-                    return parts[parts.length - 1].toLowerCase() !== 'idx';
-                });
-            }
         }
         return tagsAll;
     });
@@ -771,6 +763,17 @@
         return idxItems.length === 1;
     });
 
+    // Modify the isIdxFolder derived function to respect the hideIdxFolders setting
+    const isIdxFolder = $derived(() => {
+        // Only hide if the setting is enabled
+        if (!_setting.hideIdxFolders || viewType !== "tags") return false;
+        
+        // Check if this folder's name ends with 'idx' at the end of the path
+        const folderNameParts = thisName.split('/');
+        const lastPart = folderNameParts[folderNameParts.length - 1].toLowerCase();
+        return lastPart === 'idx';
+    });
+
     $effect(() => {
         const key = trailKey + (isRoot ? "-r" : "-x") + viewContextID;
         const sortFunc = selectCompareMethodTags(_setting, viewType == "links" ? {} : _tagInfo);
@@ -801,7 +804,7 @@
 <div
     class={`tree-item nav-folder${collapsed ? " is-collapsed" : ""}${
         isRoot ? " mod-root" : ""
-    }${isUpdating ? " updating" : ""}`}
+    }${isUpdating ? " updating" : ""}${isIdxFolder() ? " idx-folder hidden" : ""}`}
     onclick={toggleFolder}
     oncontextmenu={(evt) => {
         evt.stopPropagation();
@@ -927,5 +930,10 @@
 .has-idx-note {
     text-decoration: underline;
     text-underline-offset: 2px;
+}
+
+/* Add this new style for idx folders */
+.idx-folder.hidden {
+    display: none;
 }
 </style>
