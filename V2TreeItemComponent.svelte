@@ -93,7 +93,7 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
-            class="tree-item-self is-clickable nav-file-title"
+            class="tree-item-self is-clickable nav-file-title tagfile"
             class:is-active={isActive}
             {draggable}
             data-path={item.path}
